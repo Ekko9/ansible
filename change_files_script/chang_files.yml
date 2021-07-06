@@ -1,0 +1,31 @@
+- name: Change files
+  hosts: "{{ app_name }}"
+  gather_facts: false
+  vars_files:
+    - "{{ date }}/files.yml"
+  tasks:
+    - name: Create backup dir
+      file:
+        path: "/opt/{{ date }}"
+        state: "directory"
+    - debug:
+        msg: "{{ item.1 }}/{{ item.0.filename }}" 
+      with_subelements:
+      - "{{ files[app_name] }}"
+      - "dirname"
+    - name: Backup "{{ app_name }}" files
+      shell: |
+        if [ ! -f "/opt/{{ date }}/{{ item.0.filename }}" ] && [ -f "{{ item.1 }}/{{ item.0.filename }}" ];then
+             cp "/{{ item.1 }}/{{ item.0.filename }}" /opt/{{ date }}
+        fi
+      with_subelements:
+      - "{{ files[app_name] }}"
+      - "dirname"
+    - name: Copy "{{ app_name }}"  files
+      copy:
+        src: "{{ date }}/{{ item.0.filename }}"
+        dest: "{{ item.1 }}/{{ item.0.filename }}"
+        backup: no
+      with_subelements:
+      - "{{ files[app_name] }}"
+      - "dirname"

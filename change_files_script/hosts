@@ -1,0 +1,5 @@
+[test]
+XXX.XXX.XXX.XXX
+[test:vars]
+ansible_ssh_user=
+ansible_ssh_pass=
